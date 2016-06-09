@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -44,7 +45,8 @@ public class MergeContacts {
         System.out.println(Integer.toBinaryString(x));*/
         contactList = new TreeMap();
         android();
-        
+        //display();
+        sameName();
     }
     
     private static void android() {
@@ -66,17 +68,17 @@ public class MergeContacts {
                     String name[] = line.substring(2).split(";");
                     xor = 0;
                     for(int i = 0; i < name.length; i++) {
-                        if(i==0) 
-                            contact.put("LAST", name[0]);
-                        if(i==1) 
-                            contact.put("FIRST", name[1]);
-                        if(i==2) 
-                            contact.put("MIDDLE", name[2]);
-                        if(i==3) 
-                            contact.put("PREFIX", name[3]);
-                        if(i==4) 
-                            contact.put("SUFFIX", name[4]);
                         if(!name[i].isEmpty()) {
+                            if(i==0) 
+                                contact.put("LAST", name[0].trim());
+                            if(i==1) 
+                                contact.put("FIRST", name[1].trim());
+                            if(i==2) 
+                                contact.put("MIDDLE", name[2].trim());
+                            if(i==3) 
+                                contact.put("PREFIX", name[3].trim());
+                            if(i==4) 
+                                contact.put("SUFFIX", name[4].trim());
                             byte word[] = name[i].getBytes();
                             for(int j = 0; j < word.length; j++) {
                                xor ^= word[j];
@@ -87,13 +89,13 @@ public class MergeContacts {
                     if(line.contains("CELL:")) 
                         contact.put("TEL;CELL:", line.replace("TEL;TYPE=CELL:", ""));
                     else if(line.contains("WORK:"))
-                        contact.put("TEL;WORK:", line.substring(line.indexOf("TYPE=WORK:")+5));
+                        contact.put("TEL;WORK:", line.substring(line.indexOf("TYPE=WORK:")+10));
                     else if(line.contains("HOME:"))
-                        contact.put("TEL;HOME:", line.substring(line.indexOf("TYPE=HOME:")+5));
+                        contact.put("TEL;HOME:", line.substring(line.indexOf("TYPE=HOME:")+10));
                     else contact.put("TEL:", line.substring(4));
                 } else if(line.contains("EMAIL"))
                     contact.put("EMAIL", line.substring(line.lastIndexOf(":")+1));
-                else System.out.println(line);
+                //else System.out.println(line);
             }
         } catch(FileNotFoundException e) {
             e.printStackTrace();
@@ -139,6 +141,35 @@ public class MergeContacts {
 		}
             }
 	}
+    }
+
+    private static void display() {
+        for(Map.Entry<Integer, TreeMap<String, LinkedList<String>>> entry : contactList.entrySet()) {
+            int key = entry.getKey();
+            TreeMap value = entry.getValue();
+            System.out.println(key + " => " + value);
+        }
+    }
+
+    private static void sameName() {
+        for(Map.Entry<Integer, TreeMap<String, LinkedList<String>>> entry : contactList.entrySet()) {
+            int key = entry.getKey();
+            LinkedList l = null;
+            String first="", last = "";
+            if(entry.getValue().containsKey("FIRST"))
+                first = entry.getValue().get("FIRST").toString();
+            first = l.toString();
+            if(entry.getValue().containsKey("LAST"))
+                l = entry.getValue().get("LAST");
+            last = l.toString();
+            System.out.println(first+last);
+            for(Map.Entry<Integer, TreeMap<String, LinkedList<String>>> sub : contactList.entrySet()) {
+                int subKey = sub.getKey();
+                if(subKey != key) {
+                    
+                }
+            }
+        }
     }
     
 }
